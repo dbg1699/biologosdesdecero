@@ -1,0 +1,14 @@
+
+        body { font-family: 'Inter', sans-serif; background-color: #F4F6F0; color: #1B3128; }
+        .bg-frailejon { background-color: #2C4A3E; }
+        .text-frailejon { color: #2C4A3E; }
+        .glass-panel { background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(8px); border: 1px solid rgba(44, 74, 62, 0.1); }
+        .custom-scrollbar::-webkit-scrollbar { width: 6px; height: 6px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: #E8F0EC; border-radius: 4px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #4B7A67; border-radius: 4px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #2C4A3E; }
+
+        .cursiva{
+                font-family: 'Dancing Script', cursive;
+                
+        }

@@ -1,0 +1,1620 @@
+<!DOCTYPE html>
+<html lang="es" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SemillaLab - Biólogos desde Cero | Monitoreo de Frailejones</title>
+    <link rel="stylesheet" href="style.css">
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        paramo: {
+                            900: '#1B3128',
+                            800: '#2C4A3E', // Principal Verde Frailejón / Musgo
+                            700: '#3A6051',
+                            600: '#4B7A67',
+                            500: '#5F9680',
+                            100: '#E8F0EC',
+                            50: '#F4F6F0'  // Fondo de tarjetas marfil/verde pálido
+                        },
+                        tierra: {
+                            700: '#5C4033',
+                            500: '#8B5A2B',
+                            300: '#C49A6C',
+                            100: '#F5EBE6'
+                        },
+                        dorado: {
+                            DEFAULT: '#D4AF37',
+                            light: '#F3E5AB',
+                            dark: '#AA820A'
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'system-ui', 'sans-serif']
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- SheetJS (xlsx) CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+</head>
+<body class="min-h-screen flex flex-col selection:bg-paramo-600 selection:text-white">
+
+    <!-- HEADER / NAVIGATION FIX-->
+    <header class="fixed top-0 left-0 right-0 z-50 bg-paramo-800/95 backdrop-blur-md text-white shadow-lg border-b border-paramo-700/50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16 sm:h-20">
+                <!-- Logo & Brand -->
+                <div class="flex items-center space-x-3 cursor-pointer" onclick="window.scrollTo({top: 0, behavior: 'smooth'})">
+                    <div class="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-dorado flex items-center justify-center text-paramo-900 shadow-md transform hover:rotate-6 transition-transform">
+                        <i class="fa-solid fa-seedling text-xl sm:text-2xl"></i>
+                    </div>
+                    <div>
+                        <div class="flex items-center space-x-2">
+                            <span class="font-bold text-lg sm:text-2xl tracking-tight text-white">Semilla<span class="text-dorado">Lab</span></span>
+                            
+                        </div>
+                        <p class="text-xs text-paramo-100/80 font-medium hidden sm:block">Biólogos desde Cero</p>
+                    </div>
+                </div>
+
+                <!-- Desktop Nav Navigation Links -->
+                <nav class="hidden lg:flex items-center space-x-1 xl:space-x-2">
+                    <a href="#hero" class="nav-link px-3 py-2 rounded-lg text-sm font-medium hover:bg-paramo-700 hover:text-dorado transition-colors">Inicio</a>
+                    <a href="#problema" class="nav-link px-3 py-2 rounded-lg text-sm font-medium hover:bg-paramo-700 hover:text-dorado transition-colors">El Problema</a>
+                    <a href="#funcionamiento" class="nav-link px-3 py-2 rounded-lg text-sm font-medium hover:bg-paramo-700 hover:text-dorado transition-colors">Cómo Funciona</a>
+                    <a href="#registrar" class="nav-link px-3 py-2 rounded-lg text-sm font-medium hover:bg-paramo-700 hover:text-dorado transition-colors">Registrar</a>
+                    <a href="#registros" class="nav-link px-3 py-2 rounded-lg text-sm font-medium hover:bg-paramo-700 hover:text-dorado transition-colors">Base de Datos</a>
+                    <a href="#predictivo" class="nav-link px-3 py-2 rounded-lg text-sm font-medium hover:bg-paramo-700 hover:text-dorado transition-colors flex items-center gap-1.5">
+                        <i class="fa-solid fa-wand-magic-sparkles text-dorado text-xs"></i> Bioclima Sim
+                    </a>
+                    <a href="#faq" class="nav-link px-3 py-2 rounded-lg text-sm font-medium hover:bg-paramo-700 hover:text-dorado transition-colors">FAQ</a>
+                </nav>
+
+                <!-- Action Button & Mobile Menu Toggle -->
+                <div class="flex items-center space-x-3">
+                    <a href="#registrar" class="bg-dorado hover:bg-dorado-dark text-paramo-900 font-bold px-4 py-2 rounded-lg text-xs sm:text-sm shadow-md transition-all transform active:scale-95 flex items-center space-x-1.5">
+                        <i class="fa-solid fa-plus-circle"></i>
+                        <span class="hidden sm:inline">Nueva</span> Muestra
+                    </a>
+                    <button id="mobile-menu-btn" class="lg:hidden p-2 rounded-lg text-paramo-100 hover:bg-paramo-700 focus:outline-none">
+                        <i class="fa-solid fa-bars text-xl"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Mobile Menu Navigation -->
+        <div id="mobile-menu" class="hidden lg:hidden bg-paramo-900 border-b border-paramo-700 px-4 pt-2 pb-4 space-y-2">
+            <a href="#hero" class="mobile-link block px-3 py-2 rounded-md text-base font-medium text-white hover:bg-paramo-800">Inicio</a>
+            <a href="#problema" class="mobile-link block px-3 py-2 rounded-md text-base font-medium text-white hover:bg-paramo-800">El Problema</a>
+            <a href="#funcionamiento" class="mobile-link block px-3 py-2 rounded-md text-base font-medium text-white hover:bg-paramo-800">Cómo Funciona</a>
+            <a href="#registrar" class="mobile-link block px-3 py-2 rounded-md text-base font-medium text-white hover:bg-paramo-800">Registrar Muestra</a>
+            <a href="#registros" class="mobile-link block px-3 py-2 rounded-md text-base font-medium text-white hover:bg-paramo-800">Base de Datos & Excel</a>
+            <a href="#predictivo" class="mobile-link block px-3 py-2 rounded-md text-base font-medium text-dorado hover:bg-paramo-800">Bioclima Sim (Modelo Predictivo)</a>
+            <a href="#faq" class="mobile-link block px-3 py-2 rounded-md text-base font-medium text-white hover:bg-paramo-800">Preguntas Frecuentes</a>
+        </div>
+    </header>
+
+    <main class="flex-grow pt-16 sm:pt-20">
+
+        <!-- 1. PRESENTACIÓN / HERO SECTION -->
+        <section id="hero" class="relative bg-gradient-to-b from-paramo-800 via-paramo-800 to-paramo-900 text-white py-12 lg:py-20 overflow-hidden">
+            <!-- Subtle background ambient pattern -->
+            <div class="absolute inset-0 opacity-10 bg-[radial-gradient(#D4AF37_1px,transparent_1px)] [background-size:16px_16px]"></div>
+
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+                <div class="grid lg:grid-cols-12 gap-8 lg:gap-12 items-center">
+                    
+                    <!-- Left Hero Content -->
+                    <div class="lg:col-span-6 space-y-6 text-center lg:text-left">
+                        <div class="inline-flex items-center space-x-2 bg-paramo-700/70 border border-paramo-600 rounded-full px-4 py-1.5 text-xs sm:text-sm text-dorado font-medium">
+                            <i class="fa-solid fa-mountain-sun"></i>
+                            <span>Proyecto Escolar: Biólogos desde Cero</span>
+                        </div>
+                        
+                        <h1 class="text-3xl sm:text-5xl lg:text-6xl font-extrabold text-white tracking-tight leading-tight">
+                            Semilla<span class="text-dorado">Lab</span>
+                        </h1>
+                        
+                        <p class="text-lg sm:text-xl text-paramo-100 font-light leading-relaxed max-w-2xl mx-auto lg:mx-0">
+                            Registra y consulta observaciones reales de germinación de <strong class="text-dorado font-semibold">frailejones  <strong class="cursiva"> (Espeletia</strong> spp.)</strong> y protege la biodiversidad en los altares de agua de Colombia.
+                        </p>
+
+                        <div class="pt-2 flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4">
+                            <a href="#registrar" class="w-full sm:w-auto bg-dorado hover:bg-dorado-dark text-paramo-900 font-bold px-7 py-3.5 rounded-xl shadow-lg hover:shadow-xl transition-all text-center flex items-center justify-center space-x-2">
+                                <i class="fa-solid fa-microscope text-lg"></i>
+                                <span>Iniciar Registro</span>
+                            </a>
+                            <a href="#predictivo" class="w-full sm:w-auto bg-paramo-700/80 hover:bg-paramo-700 text-white border border-paramo-600 font-semibold px-6 py-3.5 rounded-xl transition-all text-center flex items-center justify-center space-x-2">
+                                <i class="fa-solid fa-chart-line text-dorado"></i>
+                                <span>Simulador Bioclima</span>
+                            </a>
+                        </div>
+
+                        <!-- Stats Quick Overview -->
+                        <div class="pt-6 grid grid-cols-3 gap-4 border-t border-paramo-700/60 max-w-md mx-auto lg:mx-0">
+                            <div>
+                                <p class="text-2xl font-bold text-white" id="quick-samples">0</p>
+                                <p class="text-xs text-paramo-100/70">Muestras</p>
+                            </div>
+                            <div>
+                                <p class="text-2xl font-bold text-dorado" id="quick-germinated">0</p>
+                                <p class="text-xs text-paramo-100/70">Germinadas</p>
+                            </div>
+                            <div>
+                                <p class="text-2xl font-bold text-white" id="quick-rate">0%</p>
+                                <p class="text-xs text-paramo-100/70">Tasa Media</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Right Hero Interactive Slide Carousel (10 Slides) -->
+                    <div class="lg:col-span-6">
+                        <div class="relative rounded-2xl overflow-hidden shadow-2xl border-4 border-paramo-700/50 bg-paramo-900 group">
+                            
+                            <!-- Carousel Slides Container -->
+                            <div id="hero-carousel" class="relative h-72 sm:h-96 w-full overflow-hidden">
+                                <!-- Generated dynamically via JS -->
+                            </div>
+
+                            <!-- Carousel Controls Overlay -->
+                            <div class="absolute inset-0 flex items-center justify-between p-4 pointer-events-none">
+                                <button id="prev-slide" class="pointer-events-auto bg-paramo-900/60 hover:bg-paramo-900 text-white p-3 rounded-full backdrop-blur-md transition-all hover:scale-110 opacity-80 group-hover:opacity-100">
+                                    <i class="fa-solid fa-chevron-left"></i>
+                                </button>
+                                <button id="next-slide" class="pointer-events-auto bg-paramo-900/60 hover:bg-paramo-900 text-white p-3 rounded-full backdrop-blur-md transition-all hover:scale-110 opacity-80 group-hover:opacity-100">
+                                    <i class="fa-solid fa-chevron-right"></i>
+                                </button>
+                            </div>
+
+                            <!-- Controls Toolbar Bottom -->
+                            <div class="absolute bottom-3 left-0 right-0 flex items-center justify-between px-6 z-20">
+                                <!-- Carousel Dots -->
+                                <div id="carousel-dots" class="flex items-center space-x-1.5"></div>
+
+                                <!-- Pause/Play Button -->
+                                <button id="carousel-toggle-play" class="bg-paramo-900/80 hover:bg-paramo-900 text-dorado px-3 py-1 rounded-full text-xs font-semibold backdrop-blur-md border border-paramo-700/60 flex items-center space-x-1">
+                                    <i class="fa-solid fa-pause" id="play-pause-icon"></i>
+                                    <span id="play-pause-text">Pausar</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- Bloques informativos: "¿Para qué es?" y "¿Qué puedes hacer?" -->
+                <div class="mt-16 grid md:grid-cols-2 gap-6">
+                    <div class="bg-paramo-700/40 border border-paramo-600/60 rounded-2xl p-6 sm:p-8 backdrop-blur-sm">
+                        <div class="w-12 h-12 bg-dorado/20 text-dorado rounded-xl flex items-center justify-center text-xl mb-4">
+                            <i class="fa-solid fa-bullseye"></i>
+                        </div>
+                        <h3 class="text-xl font-bold text-white mb-2">¿Para qué es SemillaLab?</h3>
+                        <p class="text-paramo-100/90 text-sm leading-relaxed">
+                            Es una herramienta web diseñada por jóvenes investigadores para estandarizar el seguimiento de experimentos de germinación de frailejones en viveros de alta montaña y escuelas rurales. Permite transformar anotaciones dispersas en evidencias digitales útiles para la conservación ecológica.
+                        </p>
+                    </div>
+
+                    <div class="bg-paramo-700/40 border border-paramo-600/60 rounded-2xl p-6 sm:p-8 backdrop-blur-sm">
+                        <div class="w-12 h-12 bg-dorado/20 text-dorado rounded-xl flex items-center justify-center text-xl mb-4">
+                            <i class="fa-solid fa-cubes"></i>
+                        </div>
+                        <h3 class="text-xl font-bold text-white mb-2">¿Qué puedes hacer en la plataforma?</h3>
+                        <p class="text-paramo-100/90 text-sm leading-relaxed">
+                            Puedes registrar tus ensayos biológicos con validaciones automáticas, calcular porcentajes de germinación, importar y exportar planillas de Excel (.xlsx / .csv), visualizar gráficos estadísticos y simular la tasa de éxito bioclimática con nuestro modelo predictivo.
+                        </p>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+
+        <!-- 2. EL PROBLEMA -->
+        <section id="problema" class="py-16 sm:py-24 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center max-w-3xl mx-auto mb-16">
+                <span class="text-paramo-800 font-bold uppercase tracking-wider text-xs sm:text-sm bg-paramo-100 px-3 py-1 rounded-full border border-paramo-600/20">
+                    Diagnóstico Ambiental & Científico
+                </span>
+                <h2 class="text-3xl sm:text-4xl font-extrabold text-paramo-900 mt-3 mb-4">
+                    La Fragmentación de la Información en los Páramos
+                </h2>
+                <p class="text-gray-600 text-base sm:text-lg">
+                    Los frailejones crecen apenas 1 cm al año. Monitorear su germinación es crítico, pero el método tradicional en papel genera vacíos de información.
+                </p>
+            </div>
+
+            <!-- Comparison Cards & Infographic -->
+            <div class="grid lg:grid-cols-2 gap-8 items-stretch">
+                <!-- Tradicional (Problema) -->
+                <div class="bg-red-50/70 border border-red-200 rounded-2xl p-6 sm:p-8 flex flex-col justify-between shadow-sm">
+                    <div>
+                        <div class="flex items-center space-x-3 mb-4">
+                            <div class="w-10 h-10 rounded-lg bg-red-100 text-red-600 flex items-center justify-center font-bold">
+                                <i class="fa-solid fa-file-xmark text-xl"></i>
+                            </div>
+                            <h3 class="text-xl font-bold text-red-900">Método Tradicional en Papel</h3>
+                        </div>
+                        <ul class="space-y-3 text-sm text-gray-700">
+                            <li class="flex items-start space-x-2">
+                                <i class="fa-solid fa-circle-xmark text-red-500 mt-1"></i>
+                                <span><strong>Hojas sueltas y cuadernos perdidos:</strong> Las observaciones en distintas libretas impiden comparar la tasa de éxito histórica entre zonas de siembra.</span>
+                            </li>
+                            <li class="flex items-start space-x-2">
+                                <i class="fa-solid fa-circle-xmark text-red-500 mt-1"></i>
+                                <span><strong>Errores de cálculo manual:</strong> Porcentajes mal calculados o conteos inconsistentes pasan desapercibidos en las libretas de campo.</span>
+                            </li>
+                            <li class="flex items-start space-x-2">
+                                <i class="fa-solid fa-circle-xmark text-red-500 mt-1"></i>
+                                <span><strong>Sin análisis en tiempo real:</strong> Imposibilidad de graficar tendencias o comparar variables clave como temperatura y humedad.</span>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="mt-6 pt-4 border-t border-red-200/60 text-xs text-red-700 font-medium">
+                        <i class="fa-solid fa-triangle-exclamation"></i> Resultado: Pérdida de datos valiosos para  la propagación y conservación de especies de frailejón.
+                    </div>
+                </div>
+
+                <!-- Solución SemillaLab -->
+                <div class="bg-paramo-800 text-white rounded-2xl p-6 sm:p-8 flex flex-col justify-between shadow-xl relative overflow-hidden">
+                    <div class="absolute -right-8 -bottom-8 opacity-10 text-dorado text-9xl">
+                        <i class="fa-solid fa-leaf"></i>
+                    </div>
+                    <div>
+                        <div class="flex items-center space-x-3 mb-4">
+                            <div class="w-10 h-10 rounded-lg bg-dorado text-paramo-900 flex items-center justify-center font-bold">
+                                <i class="fa-solid fa-seedling text-xl"></i>
+                            </div>
+                            <h3 class="text-xl font-bold text-white">Solución Unificada SemillaLab</h3>
+                        </div>
+                        <ul class="space-y-3 text-sm text-paramo-100">
+                            <li class="flex items-start space-x-2">
+                                <i class="fa-solid fa-circle-check text-dorado mt-1"></i>
+                                <span><strong>Base de datos digital centralizada:</strong> Cada muestra queda guardada con su especie, lote, páramo y coordenadas ambientales.</span>
+                            </li>
+                            <li class="flex items-start space-x-2">
+                                <i class="fa-solid fa-circle-check text-dorado mt-1"></i>
+                                <span><strong>Validación automatizada en tiempo real:</strong> Algoritmos que previenen valores imposibles o incongruentes en el registro.</span>
+                            </li>
+                            <li class="flex items-start space-x-2">
+                                <i class="fa-solid fa-circle-check text-dorado mt-1"></i>
+                                <span><strong>Integración Excel & Visualización:</strong> Descarga reportes completos, carga planillas existentes y analiza con gráficos dinámicos.</span>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="mt-6 pt-4 border-t border-paramo-700 text-xs text-dorado font-medium flex items-center justify-between">
+                        <span><i class="fa-solid fa-shield-halved"></i> Datos Estandarizados & Protegidos</span>
+                        <span class="bg-paramo-700 px-2 py-1 rounded text-white text-[10px]">100% Digital</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+
+        <!-- 3. CÓMO FUNCIONA -->
+        <section id="funcionamiento" class="py-16 bg-paramo-100 border-y border-paramo-700/10">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center max-w-2xl mx-auto mb-12">
+                    <h2 class="text-3xl font-extrabold text-paramo-900">¿Cómo Funciona el Proceso?</h2>
+                    <p class="text-gray-600 text-sm sm:text-base mt-2">Cuatro sencillos pasos interactivos desde el trabajo de campo hasta el análisis científico.</p>
+                </div>
+
+                <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                    <!-- Paso 1 -->
+                    <div class="bg-white p-6 rounded-2xl shadow-sm border border-paramo-800/10 hover:shadow-md transition-shadow relative">
+                        <div class="w-10 h-10 bg-paramo-800 text-dorado font-extrabold rounded-xl flex items-center justify-center text-lg mb-4">
+                            1
+                        </div>
+                        <h4 class="font-bold text-paramo-900 text-base mb-2">Ingresas los Datos</h4>
+                        <p class="text-gray-600 text-xs leading-relaxed">Escribes el nombre de la muestra, semillas sembradas, germinadas, especie y condiciones biológicas.</p>
+                    </div>
+
+                    <!-- Paso 2 -->
+                    <div class="bg-white p-6 rounded-2xl shadow-sm border border-paramo-800/10 hover:shadow-md transition-shadow relative">
+                        <div class="w-10 h-10 bg-paramo-800 text-dorado font-extrabold rounded-xl flex items-center justify-center text-lg mb-4">
+                            2
+                        </div>
+                        <h4 class="font-bold text-paramo-900 text-base mb-2">Validación Inteligente</h4>
+                        <p class="text-gray-600 text-xs leading-relaxed">El sistema verifica en tiempo real que las semillas germinadas no superen a las sembradas ni contengan números negativos.</p>
+                    </div>
+
+                    <!-- Paso 3 -->
+                    <div class="bg-white p-6 rounded-2xl shadow-sm border border-paramo-800/10 hover:shadow-md transition-shadow relative">
+                        <div class="w-10 h-10 bg-paramo-800 text-dorado font-extrabold rounded-xl flex items-center justify-center text-lg mb-4">
+                            3
+                        </div>
+                        <h4 class="font-bold text-paramo-900 text-base mb-2">Cálculo Automático</h4>
+                        <p class="text-gray-600 text-xs leading-relaxed">Procesa la tasa de germinación (%) e indica si la muestra tiene un nivel de germinación: Alto, Medio o Bajo.</p>
+                    </div>
+
+                    <!-- Paso 4 -->
+                    <div class="bg-white p-6 rounded-2xl shadow-sm border border-paramo-800/10 hover:shadow-md transition-shadow relative">
+                        <div class="w-10 h-10 bg-paramo-800 text-dorado font-extrabold rounded-xl flex items-center justify-center text-lg mb-4">
+                            4
+                        </div>
+                        <h4 class="font-bold text-paramo-900 text-base mb-2">Consolidado & Gráficos</h4>
+                        <p class="text-gray-600 text-xs leading-relaxed">Se guarda dinámicamente en tu base local, actualizando tablas, gráficos y la opción de exportar a Excel.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+
+        <!-- 4. REGISTRAR UNA MUESTRA (FORMULARIO INTERACTIVO) -->
+        <section id="registrar" class="py-16 sm:py-24 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid lg:grid-cols-12 gap-8 items-start">
+                
+                <!-- Left Form Panel -->
+                <div class="lg:col-span-7 bg-white rounded-3xl p-6 sm:p-10 shadow-xl border border-paramo-800/10">
+                    <div class="flex items-center space-x-3 mb-6">
+                        <div class="w-12 h-12 rounded-2xl bg-paramo-800 text-dorado flex items-center justify-center text-xl font-bold shadow-md">
+                            <i class="fa-solid fa-flask"></i>
+                        </div>
+                        <div>
+                            <h2 class="text-2xl sm:text-3xl font-extrabold text-paramo-900">Registrar Nueva Muestra</h2>
+                            <p class="text-xs sm:text-sm text-gray-500">Formulario científico con validación automática en tiempo real</p>
+                        </div>
+                    </div>
+
+                    <form id="sample-form" class="space-y-6" onsubmit="return false;">
+                        
+                        <div class="grid sm:grid-cols-2 gap-4">
+                            <!-- Campo 1: Nombre de Muestra -->
+                            <div>
+                                <label class="block text-xs font-bold uppercase tracking-wider text-paramo-900 mb-2">
+                                    Nombre de la Muestra *
+                                </label>
+                                <input type="text" id="sample-name" required placeholder="Ej. Lote Frailejón A1 - Sumapaz"
+                                    class="w-full px-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-paramo-800 focus:border-paramo-800 text-sm transition-all outline-none">
+                            </div>
+
+                            <!-- Ubicación / Páramo -->
+                            <div>
+                                <label class="block text-xs font-bold uppercase tracking-wider text-paramo-900 mb-2">
+                                    Páramo / Ubicación *
+                                </label>
+                                <select id="sample-location" required class="w-full px-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-paramo-800 text-sm transition-all outline-none bg-white">
+                                    <option value="Páramo de Sumapaz">Páramo de Sumapaz</option>
+                                    <option value="Páramo de Chingaza">Páramo de Chingaza</option>
+                                    <option value="Páramo de Rabanal">Páramo de Rabanal</option>
+                                    <option value="Páramo de Belmira">Páramo de Belmira</option>
+                                    <option value="Páramo de Los Nevados">Páramo de Los Nevados</option>
+                                    <option value="Invernadero / Laboratorio">Invernadero / Laboratorio Escolar</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="grid sm:grid-cols-2 gap-4">
+                            <!-- Especie de Frailejón -->
+                            <div>
+                                <label class="block text-xs font-bold uppercase tracking-wider text-paramo-900 mb-2">
+                                    Especie de Frailejón
+                                </label>
+                                <select id="sample-species" class="w-full px-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-paramo-800 text-sm transition-all outline-none bg-white">
+                                    <option value="Espeletia grandiflora">Espeletia grandiflora (Frailejón mayor)</option>
+                                    <option value="Espeletia killipii">Espeletia killipii</option>
+                                    <option value="Espeletia argentea">Espeletia argentea (Plateado)</option>
+                                    <option value="Espeletia uribei">Espeletia uribei</option>
+                                    <option value="Espeletia pycnophylla">Espeletia pycnophylla</option>
+                                </select>
+                            </div>
+
+                            <!-- Fecha de Registro -->
+                            <div>
+                                <label class="block text-xs font-bold uppercase tracking-wider text-paramo-900 mb-2">
+                                    Fecha de Observación *
+                                </label>
+                                <input type="date" id="sample-date" required class="w-full px-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-paramo-800 text-sm transition-all outline-none">
+                            </div>
+                        </div>
+
+                        <!-- Semillas Sembradas vs Germinadas -->
+                        <div class="grid sm:grid-cols-2 gap-4 bg-paramo-50 p-4 rounded-2xl border border-paramo-800/10">
+                            <div>
+                                <label class="block text-xs font-bold uppercase tracking-wider text-paramo-900 mb-2">
+                                    Semillas Sembradas *
+                                </label>
+                                <input type="number" id="seeds-planted" min="1" required placeholder="Ej. 100"
+                                    class="w-full px-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-paramo-800 text-sm transition-all outline-none font-semibold">
+                            </div>
+
+                            <div>
+                                <label class="block text-xs font-bold uppercase tracking-wider text-paramo-900 mb-2">
+                                    Semillas Germinadas *
+                                </label>
+                                <input type="number" id="seeds-germinated" min="0" required placeholder="Ej. 65"
+                                    class="w-full px-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-paramo-800 text-sm transition-all outline-none font-semibold">
+                            </div>
+                        </div>
+
+                        <!-- Variables Bioclimáticas -->
+                        <div class="grid sm:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-xs font-bold uppercase tracking-wider text-paramo-900 mb-1">
+                                    Temperatura Media (°C)
+                                </label>
+                                <input type="number" id="sample-temp" step="0.1" value="11.5" placeholder="Ej. 12"
+                                    class="w-full px-4 py-2.5 rounded-xl border border-gray-300 text-sm outline-none focus:ring-2 focus:ring-paramo-800">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold uppercase tracking-wider text-paramo-900 mb-1">
+                                    Humedad Relativa (%)
+                                </label>
+                                <input type="number" id="sample-humidity" min="0" max="100" value="82" placeholder="Ej. 85"
+                                    class="w-full px-4 py-2.5 rounded-xl border border-gray-300 text-sm outline-none focus:ring-2 focus:ring-paramo-800">
+                            </div>
+                        </div>
+
+                        <!-- Validation Message Box -->
+                        <div id="validation-alert" class="hidden p-4 rounded-xl text-xs sm:text-sm font-semibold flex items-center space-x-3"></div>
+
+                        <!-- Submit Button -->
+                        <button type="button" id="btn-submit-sample"
+                            class="w-full bg-paramo-800 hover:bg-paramo-900 text-white font-bold py-4 rounded-xl shadow-lg transition-all transform active:scale-98 flex items-center justify-center space-x-2">
+                            <i class="fa-solid fa-calculator text-dorado"></i>
+                            <span>Calcular y Agregar Muestra</span>
+                        </button>
+                    </form>
+                </div>
+
+                <!-- Right Live Preview Card -->
+                <div class="lg:col-span-5 space-y-6">
+                    <div class="bg-paramo-800 text-white rounded-3xl p-6 sm:p-8 shadow-xl border border-paramo-700 relative overflow-hidden">
+                        <div class="flex items-center justify-between border-b border-paramo-700 pb-4 mb-6">
+                            <span class="text-xs font-bold uppercase tracking-widest text-dorado">Cálculo en Tiempo Real</span>
+                            <span class="bg-paramo-700 text-white text-[10px] font-bold px-2 py-1 rounded">Vista Previa</span>
+                        </div>
+
+                        <div class="text-center py-6 space-y-2">
+                            <p class="text-xs text-paramo-100/70 font-medium">Porcentaje de Germinación Estimado</p>
+                            <div class="text-5xl sm:text-6xl font-black text-dorado transition-all" id="preview-rate">
+                                0.0%
+                            </div>
+                            <div class="inline-block mt-2 px-3 py-1 rounded-full text-xs font-bold" id="preview-badge">
+                                Esperando Datos...
+                            </div>
+                        </div>
+
+                        <div class="mt-6 space-y-3 bg-paramo-900/60 p-4 rounded-2xl text-xs text-paramo-100/90">
+                            <div class="flex justify-between">
+                                <span>Total Sembradas:</span>
+                                <span class="font-bold text-white" id="preview-planted">0</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span>Total Germinadas:</span>
+                                <span class="font-bold text-dorado" id="preview-germinated">0</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span>Fórmula Aplicada:</span>
+                                <span class="font-mono text-[11px] text-gray-300">(Germinadas / Sembradas) × 100</span>
+                            </div>
+                        </div>
+
+                        <div class="mt-6 text-[11px] text-paramo-100/60 leading-tight">
+                            <i class="fa-solid fa-circle-info text-dorado"></i> Este valor se recalcula de inmediato al escribir números válidos en el formulario.
+                        </div>
+                    </div>
+
+                    <!-- Eco Tips Card -->
+                    <div class="bg-tierra-100/80 border border-tierra-300/40 rounded-2xl p-6 text-tierra-700 text-xs sm:text-sm space-y-2">
+                        <h4 class="font-bold text-tierra-700 flex items-center gap-2">
+                            <i class="fa-solid fa-lightbulb text-dorado-dark"></i> Consejo de Germinación en Páramo
+                        </h4>
+                        <p class="leading-relaxed">
+                            Las semillas de <em>Espeletia grandiflora</em> requieren un sustrato bien drenado con alta humedad atmosférica y fluctuaciones térmicas controladas para romper la latencia física.
+                        </p>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+
+        <!-- 5. CONSULTAR REGISTROS, BASE DE DATOS & EXCEL HUB -->
+        <section id="registros" class="py-16 bg-paramo-50 border-t border-paramo-800/10">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
+                
+                <!-- Section Header -->
+                <div class="flex flex-col md:flex-row md:items-end justify-between gap-4">
+                    <div>
+                        <span class="text-xs font-bold text-paramo-800 uppercase tracking-widest bg-paramo-100 px-3 py-1 rounded-full border border-paramo-800/20">
+                            Consolidado Nacional
+                        </span>
+                        <h2 class="text-3xl font-extrabold text-paramo-900 mt-2">Base de Datos de Germinación</h2>
+                        <p class="text-gray-600 text-sm">Gestiona, busca, importa y exporta registros científicos en Excel/CSV</p>
+                    </div>
+
+                    <!-- Excel Import & Export Buttons -->
+                    <div class="flex flex-wrap items-center gap-3">
+                        <label for="excel-file-input" class="cursor-pointer bg-white hover:bg-gray-50 text-paramo-800 border border-paramo-800/30 px-4 py-2.5 rounded-xl font-bold text-xs sm:text-sm shadow-sm transition-all flex items-center space-x-2">
+                            <i class="fa-solid fa-file-import text-green-600 text-base"></i>
+                            <span>Cargar Excel / CSV</span>
+                            <input type="file" id="excel-file-input" accept=".xlsx, .xls, .csv" class="hidden">
+                        </label>
+
+                        <button id="btn-export-excel" class="bg-paramo-800 hover:bg-paramo-900 text-white px-4 py-2.5 rounded-xl font-bold text-xs sm:text-sm shadow-md transition-all flex items-center space-x-2">
+                            <i class="fa-solid fa-file-excel text-dorado text-base"></i>
+                            <span>Exportar Excel</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- KPI Metric Cards Grid -->
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6">
+                    <div class="bg-white p-5 rounded-2xl border border-paramo-800/10 shadow-sm">
+                        <p class="text-xs text-gray-500 font-semibold uppercase tracking-wider">Muestras Totales</p>
+                        <p class="text-3xl font-extrabold text-paramo-900 mt-1" id="kpi-total-samples">0</p>
+                        <p class="text-[11px] text-paramo-600 mt-1"><i class="fa-solid fa-database"></i> Registros activos</p>
+                    </div>
+
+                    <div class="bg-white p-5 rounded-2xl border border-paramo-800/10 shadow-sm">
+                        <p class="text-xs text-gray-500 font-semibold uppercase tracking-wider">Semillas Sembradas</p>
+                        <p class="text-3xl font-extrabold text-paramo-900 mt-1" id="kpi-total-planted">0</p>
+                        <p class="text-[11px] text-gray-500 mt-1"><i class="fa-solid fa-seedling"></i> Semillas evaluadas</p>
+                    </div>
+
+                    <div class="bg-white p-5 rounded-2xl border border-paramo-800/10 shadow-sm">
+                        <p class="text-xs text-gray-500 font-semibold uppercase tracking-wider">Semillas Germinadas</p>
+                        <p class="text-3xl font-extrabold text-green-700 mt-1" id="kpi-total-germinated">0</p>
+                        <p class="text-[11px] text-green-600 mt-1"><i class="fa-solid fa-sprout"></i> Brotes exitosos</p>
+                    </div>
+
+                    <div class="bg-white p-5 rounded-2xl border border-paramo-800/10 shadow-sm">
+                        <p class="text-xs text-gray-500 font-semibold uppercase tracking-wider">Promedio Tasa (%)</p>
+                        <p class="text-3xl font-extrabold text-dorado-dark mt-1" id="kpi-avg-rate">0%</p>
+                        <p class="text-[11px] text-gray-500 mt-1"><i class="fa-solid fa-chart-pie"></i> Eficiencia media</p>
+                    </div>
+                </div>
+
+                <!-- Interactive Filters & Search Bar -->
+                <div class="bg-white p-4 rounded-2xl border border-paramo-800/10 shadow-sm flex flex-col md:flex-row gap-4 items-center justify-between">
+                    <!-- Search Bar -->
+                    <div class="relative w-full md:w-96">
+                        <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-3.5 text-gray-400"></i>
+                        <input type="text" id="search-input" placeholder="Buscar por muestra, páramo o especie..."
+                            class="w-full pl-10 pr-4 py-2.5 rounded-xl border border-gray-300 text-sm focus:ring-2 focus:ring-paramo-800 outline-none">
+                    </div>
+
+                    <!-- Category Filter -->
+                    <div class="flex items-center space-x-2 w-full md:w-auto overflow-x-auto pb-2 md:pb-0">
+                        <span class="text-xs font-bold text-gray-500 uppercase whitespace-nowrap">Filtrar:</span>
+                        <button class="filter-btn active bg-paramo-800 text-white text-xs px-3 py-1.5 rounded-lg font-semibold transition-all whitespace-nowrap" data-filter="all">Todos</button>
+                        <button class="filter-btn bg-gray-100 text-gray-700 hover:bg-gray-200 text-xs px-3 py-1.5 rounded-lg font-semibold transition-all whitespace-nowrap" data-filter="high">Alta (>70%)</button>
+                        <button class="filter-btn bg-gray-100 text-gray-700 hover:bg-gray-200 text-xs px-3 py-1.5 rounded-lg font-semibold transition-all whitespace-nowrap" data-filter="medium">Media (30-70%)</button>
+                        <button class="filter-btn bg-gray-100 text-gray-700 hover:bg-gray-200 text-xs px-3 py-1.5 rounded-lg font-semibold transition-all whitespace-nowrap" data-filter="low">Baja (<30%)</button>
+                    </div>
+                </div>
+
+                <!-- Main Interactive Table -->
+                <div class="bg-white rounded-2xl border border-paramo-800/10 shadow-sm overflow-hidden">
+                    <div class="overflow-x-auto custom-scrollbar">
+                        <table class="w-full text-left border-collapse">
+                            <thead>
+                                <tr class="bg-paramo-800 text-white text-xs uppercase tracking-wider font-bold">
+                                    <th class="py-3.5 px-4">Muestra</th>
+                                    <th class="py-3.5 px-4">Páramo / Especie</th>
+                                    <th class="py-3.5 px-4">Fecha</th>
+                                    <th class="py-3.5 px-4 text-center">Sembradas</th>
+                                    <th class="py-3.5 px-4 text-center">Germinadas</th>
+                                    <th class="py-3.5 px-4 text-center">% Germinación</th>
+                                    <th class="py-3.5 px-4 text-right">Acción</th>
+                                </tr>
+                            </thead>
+                            <tbody id="samples-table-body" class="divide-y divide-gray-100 text-xs sm:text-sm">
+                                <!-- Dynamic rows rendered via JavaScript -->
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Table Footer / Reset -->
+                    <div class="p-4 bg-gray-50 border-t border-gray-100 flex flex-col sm:flex-row items-center justify-between gap-2 text-xs text-gray-500">
+                        <span id="table-count-label">Cargando datos...</span>
+                        <button id="btn-reset-default" class="text-paramo-800 hover:underline font-semibold flex items-center gap-1">
+                            <i class="fa-solid fa-rotate-right"></i> Restaurar Muestras por Defecto
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Chart Analytics Dashboard -->
+                <div class="bg-white p-6 rounded-2xl border border-paramo-800/10 shadow-sm space-y-4">
+                    <div class="flex items-center justify-between">
+                        <h3 class="text-lg font-bold text-paramo-900 flex items-center gap-2">
+                            <i class="fa-solid fa-chart-column text-paramo-800"></i> Comparativa Visual de Muestras
+                        </h3>
+                        <span class="text-xs text-gray-400">Actualizado dinámicamente</span>
+                    </div>
+                    <div class="relative h-64 sm:h-80 w-full">
+                        <canvas id="germination-chart"></canvas>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+
+        <!-- 6. MODELO PREDICTIVO INNOVADOR (BIOCLIMA SIM) -->
+        <section id="predictivo" class="py-16 sm:py-24 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="bg-gradient-to-br from-paramo-900 via-paramo-800 to-paramo-900 text-white rounded-3xl p-6 sm:p-12 shadow-2xl relative overflow-hidden border border-paramo-700">
+                
+                <!-- Ambient background elements -->
+                <div class="absolute -right-20 -top-20 w-80 h-80 bg-dorado/10 rounded-full blur-3xl pointer-events-none"></div>
+
+                <!-- Section Header -->
+                <div class="max-w-3xl mb-10">
+                    <div class="inline-flex items-center space-x-2 bg-dorado/20 text-dorado border border-dorado/30 rounded-full px-3 py-1 text-xs font-bold uppercase tracking-wider mb-3">
+                        <i class="fa-solid fa-brain"></i> Algoritmo Bioclimático Predictivo
+                    </div>
+                    <h2 class="text-3xl sm:text-4xl font-extrabold tracking-tight">Bioclima Sim: Predicción de Germinación</h2>
+                    <p class="text-paramo-100/80 text-sm sm:text-base mt-2">
+                        Simula la tasa de éxito estimada y días requeridos para radícula según microclima de alta montaña y tratamientos previos.
+                    </p>
+                </div>
+
+                <div class="grid lg:grid-cols-12 gap-8 items-center">
+                    
+                    <!-- Controls Column -->
+                    <div class="lg:col-span-7 bg-paramo-800/80 p-6 rounded-2xl border border-paramo-700 space-y-6">
+                        
+                        <!-- Slider 1: Temperatura -->
+                        <div>
+                            <div class="flex justify-between text-xs font-bold mb-2">
+                                <label>Temperatura Promedio (°C)</label>
+                                <span class="text-dorado font-mono text-sm" id="sim-temp-val">12.0 °C</span>
+                            </div>
+                            <input type="range" id="sim-temp" min="4" max="22" step="0.5" value="12"
+                                class="w-full accent-dorado h-2 bg-paramo-700 rounded-lg cursor-pointer">
+                            <div class="flex justify-between text-[10px] text-paramo-100/50 mt-1">
+                                <span>4°C (Helada Páramo)</span>
+                                <span>12°C (Óptimo)</span>
+                                <span>22°C (Cálido)</span>
+                            </div>
+                        </div>
+
+                        <!-- Slider 2: Humedad Relativa -->
+                        <div>
+                            <div class="flex justify-between text-xs font-bold mb-2">
+                                <label>Humedad Relativa del Sustrato (%)</label>
+                                <span class="text-dorado font-mono text-sm" id="sim-humidity-val">80 %</span>
+                            </div>
+                            <input type="range" id="sim-humidity" min="30" max="100" step="1" value="80"
+                                class="w-full accent-dorado h-2 bg-paramo-700 rounded-lg cursor-pointer">
+                            <div class="flex justify-between text-[10px] text-paramo-100/50 mt-1">
+                                <span>30% (Seco)</span>
+                                <span>80% (Páramo Húmedo)</span>
+                                <span>100% (Saturado)</span>
+                            </div>
+                        </div>
+
+                        <!-- Altitud Slider -->
+                        <div>
+                            <div class="flex justify-between text-xs font-bold mb-2">
+                                <label>Altitud de Origen (m.s.n.m.)</label>
+                                <span class="text-dorado font-mono text-sm" id="sim-alt-val">3400 m</span>
+                            </div>
+                            <input type="range" id="sim-alt" min="2800" max="4200" step="100" value="3400"
+                                class="w-full accent-dorado h-2 bg-paramo-700 rounded-lg cursor-pointer">
+                        </div>
+
+                        <!-- Radio Buttons: Pre-tratamiento de la semilla -->
+                        <div>
+                            <label class="block text-xs font-bold uppercase tracking-wider text-paramo-100 mb-2">
+                                Pre-tratamiento de Germinación
+                            </label>
+                            <div class="grid grid-cols-3 gap-2 text-xs">
+                                <label class="cursor-pointer">
+                                    <input type="radio" name="sim-treatment" value="control" checked class="hidden peer">
+                                    <div class="p-2.5 rounded-xl border border-paramo-700 peer-checked:border-dorado peer-checked:bg-dorado/20 text-center font-semibold transition-all">
+                                        Sin tratamiento (Control)
+                                    </div>
+                                </label>
+                                <label class="cursor-pointer">
+                                    <input type="radio" name="sim-treatment" value="cold" class="hidden peer">
+                                    <div class="p-2.5 rounded-xl border border-paramo-700 peer-checked:border-dorado peer-checked:bg-dorado/20 text-center font-semibold transition-all">
+                                        Estratificación en Frío
+                                    </div>
+                                </label>
+                                <label class="cursor-pointer">
+                                    <input type="radio" name="sim-treatment" value="scarification" class="hidden peer">
+                                    <div class="p-2.5 rounded-xl border border-paramo-700 peer-checked:border-dorado peer-checked:bg-dorado/20 text-center font-semibold transition-all">
+                                        Escarificación Mecánica
+                                    </div>
+                                </label>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <!-- Live Dynamic Simulation Results -->
+                    <div class="lg:col-span-5 bg-paramo-900/90 p-6 sm:p-8 rounded-2xl border border-dorado/30 space-y-6 text-center">
+                        <div>
+                            <p class="text-xs uppercase tracking-widest text-paramo-100/70 font-bold">Éxito Estimado de Germinación</p>
+                            <div class="text-5xl sm:text-6xl font-black text-dorado mt-2 font-mono" id="sim-result-rate">
+                                0%
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-4 py-4 border-y border-paramo-700 text-left">
+                            <div>
+                                <p class="text-[11px] text-paramo-100/60 font-medium">Días a 1ª Radícula:</p>
+                                <p class="text-xl font-bold text-white font-mono" id="sim-result-days">-- días</p>
+                            </div>
+                            <div>
+                                <p class="text-[11px] text-paramo-100/60 font-medium">Índice Vigor Páramo:</p>
+                                <p class="text-xl font-bold text-green-400 font-mono" id="sim-result-vigor">Medio</p>
+                            </div>
+                        </div>
+
+                        <!-- Botanical Recommendation Box -->
+                        <div class="text-left bg-paramo-800 p-4 rounded-xl border border-paramo-700 text-xs text-paramo-100/90 leading-relaxed">
+                            <span class="font-bold text-dorado block mb-1">
+                                <i class="fa-solid fa-microscope"></i> Recomendación Científica:
+                            </span>
+                            <span id="sim-result-recommendation">Cargando análisis bioclimático...</span>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </section>
+
+
+        <!-- 7. PREGUNTAS FRECUENTES (FAQ) -->
+        <section id="faq" class="py-16 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-12">
+                <h2 class="text-3xl font-extrabold text-paramo-900">Preguntas Frecuentes (FAQ)</h2>
+                <p class="text-gray-600 text-sm mt-1">Resolvemos dudas técnicas y metodológicas del proyecto SemillaLab</p>
+            </div>
+
+            <div class="space-y-4" id="faq-accordion">
+                <!-- Item 1 -->
+                <div class="bg-white rounded-2xl border border-paramo-800/10 shadow-sm overflow-hidden">
+                    <button class="faq-btn w-full p-5 text-left font-bold text-paramo-900 flex justify-between items-center focus:outline-none">
+                        <span>¿Cómo se calcula el porcentaje de germinación en la plataforma?</span>
+                        <i class="fa-solid fa-chevron-down text-paramo-600 transition-transform duration-300"></i>
+                    </button>
+                    <div class="faq-content hidden p-5 pt-0 text-gray-600 text-xs sm:text-sm leading-relaxed border-t border-gray-100">
+                        El porcentaje se obtiene aplicando la fórmula matemática estándar en botánica:
+                        <br><br>
+                        <code class="bg-paramo-50 text-paramo-900 px-3 py-1 rounded border border-paramo-800/10 font-mono text-xs">Porcentaje (%) = (Semillas Germinadas / Semillas Sembradas) * 100</code>
+                        <br><br>
+                        SemillaLab ejecuta esta validación en tiempo real en la interfaz de usuario.
+                    </div>
+                </div>
+
+                <!-- Item 2 -->
+                <div class="bg-white rounded-2xl border border-paramo-800/10 shadow-sm overflow-hidden">
+                    <button class="faq-btn w-full p-5 text-left font-bold text-paramo-900 flex justify-between items-center focus:outline-none">
+                        <span>¿Los datos quedan guardados si cierro el navegador?</span>
+                        <i class="fa-solid fa-chevron-down text-paramo-600 transition-transform duration-300"></i>
+                    </button>
+                    <div class="faq-content hidden p-5 pt-0 text-gray-600 text-xs sm:text-sm leading-relaxed border-t border-gray-100">
+                        ¡Sí! Los datos ingresados e importados se guardan automáticamente en la memoria local de tu navegador (LocalStorage). Además, puedes usar el botón de <strong>Exportar a Excel</strong> para descargar una copia de respaldo permanente en tu equipo.
+                    </div>
+                </div>
+
+                <!-- Item 3 -->
+                <div class="bg-white rounded-2xl border border-paramo-800/10 shadow-sm overflow-hidden">
+                    <button class="faq-btn w-full p-5 text-left font-bold text-paramo-900 flex justify-between items-center focus:outline-none">
+                        <span>¿Qué sucede si escribo un número negativo o mayor de germinadas que sembradas?</span>
+                        <i class="fa-solid fa-chevron-down text-paramo-600 transition-transform duration-300"></i>
+                    </button>
+                    <div class="faq-content hidden p-5 pt-0 text-gray-600 text-xs sm:text-sm leading-relaxed border-t border-gray-100">
+                        El sistema integra un módulo de validación en tiempo real. Si ingresas valores biológicamente imposibles (ej. 150 germinadas de 100 sembradas o números negativos), la plataforma mostrará un aviso de advertencia y bloqueará el guardado hasta corregir los datos.
+                    </div>
+                </div>
+
+                <!-- Item 4 -->
+                <div class="bg-white rounded-2xl border border-paramo-800/10 shadow-sm overflow-hidden">
+                    <button class="faq-btn w-full p-5 text-left font-bold text-paramo-900 flex justify-between items-center focus:outline-none">
+                        <span>¿Puedo conectar mis planillas de datos previas de Excel?</span>
+                        <i class="fa-solid fa-chevron-down text-paramo-600 transition-transform duration-300"></i>
+                    </button>
+                    <div class="faq-content hidden p-5 pt-0 text-gray-600 text-xs sm:text-sm leading-relaxed border-t border-gray-100">
+                        Totalmente. En la sección de Base de Datos encontrarás la función <strong>"Cargar Excel / CSV"</strong> respaldada por la librería SheetJS, la cual lee tus registros históricos y los fusiona de inmediato con la plataforma.
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+
+    <!-- FOOTER ECOLÓGICO Y CIENTÍFICO -->
+    <footer class="bg-paramo-900 text-white border-t border-paramo-800 pt-12 pb-8">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
+            <div class="grid md:grid-cols-12 gap-8 items-center border-b border-paramo-800 pb-8">
+                <div class="md:col-span-6 space-y-3">
+                    <div class="flex items-center space-x-2">
+                        <div class="w-8 h-8 rounded-lg bg-dorado text-paramo-900 flex items-center justify-center font-bold">
+                            <i class="fa-solid fa-seedling"></i>
+                        </div>
+                        <span class="text-xl font-bold tracking-tight">Semilla<span class="text-dorado">Lab</span></span>
+                    </div>
+                    <p class="text-xs text-paramo-100/70 max-w-md leading-relaxed">
+                        Plataforma de ciencia ciudadana juvenil dedicada al monitoreo, registro y protección de la germinación de frailejones en los altares de agua de Colombia.
+                    </p>
+                </div>
+
+                <div class="md:col-span-6 flex flex-col sm:flex-row items-center md:justify-end gap-4 text-xs">
+                    <div class="bg-paramo-800 px-4 py-3 rounded-xl border border-paramo-700 text-center sm:text-left">
+                        <span class="text-gray-400 block">Creado por:</span>
+                        <span class="font-bold text-dorado">Equipo Juvenil "Biólogos desde Cero"</span>
+                    </div>
+                    <a href="#hero" class="bg-paramo-700 hover:bg-paramo-600 text-white font-bold px-4 py-3 rounded-xl transition-all flex items-center space-x-2">
+                        <i class="fa-solid fa-arrow-up"></i>
+                        <span>Volver arriba</span>
+                    </a>
+                </div>
+            </div>
+
+            <div class="flex flex-col sm:flex-row items-center justify-between text-xs text-paramo-100/60 gap-4">
+                <p>© <span id="year-label">2026</span> SemillaLab | Páramos de Colombia. Todos los derechos reservados.</p>
+                <div class="flex items-center space-x-4">
+                    <span class="flex items-center gap-1"><i class="fa-solid fa-heart text-red-400"></i> Por la biodiversidad</span>
+                    <span class="flex items-center gap-1"><i class="fa-solid fa-droplet text-blue-400"></i> Protejamos el Agua</span>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+
+    <!-- JAVASCRIPT LOGIC -->
+    <script>
+        // Default Sample Data (6-8 Paramo Samples)
+        const DEFAULT_SAMPLES = [
+            { id: '1', name: 'Muestra A1 - Chingaza', location: 'Páramo de Chingaza', species: 'Espeletia grandiflora', date: '2026-03-10', planted: 100, germinated: 78, temp: 11.2, humidity: 85 },
+            { id: '2', name: 'Lote Sumapaz B2', location: 'Páramo de Sumapaz', species: 'Espeletia killipii', date: '2026-03-12', planted: 150, germinated: 92, temp: 10.5, humidity: 88 },
+            { id: '3', name: 'Ensayo Rabanal C', location: 'Páramo de Rabanal', species: 'Espeletia argentea', date: '2026-03-15', planted: 80, germinated: 32, temp: 13.0, humidity: 75 },
+            { id: '4', name: 'Invernadero Control 1', location: 'Invernadero / Laboratorio', species: 'Espeletia grandiflora', date: '2026-03-18', planted: 200, germinated: 164, temp: 14.5, humidity: 80 },
+            { id: '5', name: 'Lote Belmira E4', location: 'Páramo de Belmira', species: 'Espeletia pycnophylla', date: '2026-03-20', planted: 120, germinated: 48, temp: 12.0, humidity: 82 },
+            { id: '6', name: 'Muestra Los Nevados N1', location: 'Páramo de Los Nevados', species: 'Espeletia uribei', date: '2026-03-22', planted: 90, germinated: 18, temp: 8.5, humidity: 90 }
+        ];
+
+        // Carousel Data (10 Slides with Paramo thematic SVGs and descriptions)
+        const CAROUSEL_SLIDES = [
+            {
+                title: "Monitoreo en Páramo de Chingaza",
+                sub: "Recolección de semillas maduras de Espeletia grandiflora",
+                tag: "Campo / Chingaza",
+                icon: "fa-mountain",
+                bgGradient: "from-emerald-900 to-paramo-800",
+                image: "01.jpeg"
+            },
+            {
+                title: "Germinación en Vivero Escolar",
+                sub: "Primeras radículas observadas tras 35 días de incubación",
+                tag: "Laboratorio",
+                icon: "fa-microscope",
+                bgGradient: "from-paramo-800 to-teal-900",
+                image: "02.jpeg"
+            },
+            {
+                title: "Páramo de Sumapaz - Altares de Agua",
+                sub: "Evaluación de la viabilidad de semillas de frailejón",
+                tag: "Conservación",
+                icon: "fa-droplet",
+                bgGradient: "from-teal-900 to-paramo-900",
+                image: "03.jpeg"
+            },
+            {
+                title: "Biólogos desde Cero en Acción",
+                sub: "Equipo juvenil midiendo variables climáticas de siembra",
+                tag: "Equipo Juvenil",
+                icon: "fa-users",
+                bgGradient: "from-paramo-900 to-emerald-950",
+                image: "04.jpeg"
+            },
+            {
+                title: "Análisis Microclimático",
+                sub: "Registro continuo de humedad relativa y temperatura ambiental",
+                tag: "Medición",
+                icon: "fa-temperature-low",
+                bgGradient: "from-emerald-950 to-paramo-800",
+                image: "05.jpeg"
+            },
+            {
+                title: "Estratos de Sustrato Orgánico",
+                sub: "Pruebas de germinación en diferentes sustratos",
+                tag: "Ensayo Botánico",
+                icon: "fa-seedling",
+                bgGradient: "from-paramo-800 to-slate-900",
+                image: "06.jpeg"
+            },
+            {
+                title: "Escarificación Mecánica de Semillas",
+                sub: "Ruptura suave de las estructuras protectoras (Cubierta de la Cipsela y de la semilla)",
+                tag: "Técnica",
+                icon: "fa-hand-holding-hand",
+                bgGradient: "from-slate-900 to-teal-950",
+                image: "01.jpeg"
+            },
+            {
+                title: "Páramo de Belmira y Rosetas",
+                sub: "Monitoreo de la supervivencia de plántulas de 3 meses",
+                tag: "Belmira / Antioquia",
+                icon: "fa-leaf",
+                bgGradient: "from-teal-950 to-emerald-900",
+                image: "02.jpeg"
+            },
+            {
+                title: "Siembra Estandarizada en Lotes",
+                sub: "Distribución uniforme de 100 semillas por bandeja de germinación",
+                tag: "Protocolo",
+                icon: "fa-table-cells",
+                bgGradient: "from-emerald-900 to-paramo-900",
+                image: "03.jpeg"
+            },
+            {
+                title: "Reforestación Participativa",
+                sub: "Trasplante de plántulas de frailejón a áreas degradadas del ecosistema de páramo",
+                tag: "Restauración",
+                icon: "fa-tree",
+                bgGradient: "from-paramo-900 to-paramo-800",
+                image: "04.jpeg"
+            }
+        ];
+
+        // State Management
+        let samples = [];
+        let activeFilter = 'all';
+        let searchQuery = '';
+        let currentSlide = 0;
+        let carouselInterval = null;
+        let isCarouselPlaying = true;
+        let chartInstance = null;
+
+        // --- INITIALIZATION ---
+        window.onload = function () {
+            // Set current year
+            document.getElementById('year-label').innerText = new Date().getFullYear();
+            
+            // Set default date input to today
+            document.getElementById('sample-date').value = new Date().toISOString().split('T')[0];
+
+            // Load samples from LocalStorage or load defaults
+            loadSamples();
+
+            // Initialize UI Components
+            initCarousel();
+            initFormValidation();
+            initTableEvents();
+            initExcelModule();
+            initPredictiveSim();
+            initFAQ();
+            initMobileNav();
+
+            // Render Chart & Data
+            renderAll();
+        };
+
+        // --- LOCAL STORAGE & DATA HANDLING ---
+        function loadSamples() {
+            const stored = localStorage.getItem('semillalab_samples');
+            if (stored) {
+                try {
+                    samples = JSON.parse(stored);
+                } catch (e) {
+                    samples = [...DEFAULT_SAMPLES];
+                }
+            } else {
+                samples = [...DEFAULT_SAMPLES];
+                saveSamples();
+            }
+        }
+
+        function saveSamples() {
+            localStorage.setItem('semillalab_samples', JSON.stringify(samples));
+        }
+
+        // --- CAROUSEL MODULE ---
+        function initCarousel() {
+            const container = document.getElementById('hero-carousel');
+            const dotsContainer = document.getElementById('carousel-dots');
+            
+            container.innerHTML = '';
+            dotsContainer.innerHTML = '';
+
+            CAROUSEL_SLIDES.forEach((slide, index) => {
+                // Render Slide
+                const slideDiv = document.createElement('div');
+                slideDiv.className = `absolute inset-0 transition-opacity duration-700 ease-in-out flex flex-col justify-end p-6 sm:p-8 bg-gradient-to-t ${slide.bgGradient} ${index === 0 ? 'opacity-100 z-10' : 'opacity-0 z-0'}`;
+                slideDiv.setAttribute('data-slide', index);
+                
+                slideDiv.innerHTML = `
+    ${slide.image ? `
+        <img
+            src="${slide.image}"
+            alt="${slide.title}"
+            class="absolute inset-0 w-full h-full object-cover"
+        >
+    ` : ''}
+
+    <div class="absolute inset-0 bg-gradient-to-t from-paramo-900/95 via-paramo-900/40 to-transparent"></div>
+
+    <div class="relative z-10 space-y-2">
+        <span class="bg-dorado/90 text-paramo-900 text-[10px] font-extrabold px-2.5 py-1 rounded-full uppercase tracking-wider inline-flex items-center gap-1 shadow">
+            <i class="fa-solid ${slide.icon}"></i> ${slide.tag}
+        </span>
+
+        <h3 class="text-xl sm:text-2xl font-bold text-white drop-shadow">
+            ${slide.title}
+        </h3>
+
+        <p class="text-xs sm:text-sm text-paramo-100/90 font-light drop-shadow">
+            ${slide.sub}
+        </p>
+    </div>
+`;
+                container.appendChild(slideDiv);
+
+                // Render Dot
+                const dot = document.createElement('button');
+                dot.className = `w-2.5 h-2.5 rounded-full transition-all ${index === 0 ? 'bg-dorado w-6' : 'bg-white/40 hover:bg-white'}`;
+                dot.addEventListener('click', () => goToSlide(index));
+                dotsContainer.appendChild(dot);
+            });
+
+            // Navigation buttons
+            document.getElementById('prev-slide').addEventListener('click', () => {
+                goToSlide((currentSlide - 1 + CAROUSEL_SLIDES.length) % CAROUSEL_SLIDES.length);
+            });
+            document.getElementById('next-slide').addEventListener('click', () => {
+                goToSlide((currentSlide + 1) % CAROUSEL_SLIDES.length);
+            });
+
+            // Toggle Play/Pause
+            document.getElementById('carousel-toggle-play').addEventListener('click', toggleCarouselPlay);
+
+            startCarouselAuto();
+        }
+
+        function goToSlide(index) {
+            const slides = document.querySelectorAll('#hero-carousel > div');
+            const dots = document.querySelectorAll('#carousel-dots > button');
+
+            slides[currentSlide].classList.remove('opacity-100', 'z-10');
+            slides[currentSlide].classList.add('opacity-0', 'z-0');
+            dots[currentSlide].className = 'w-2.5 h-2.5 rounded-full bg-white/40 hover:bg-white transition-all';
+
+            currentSlide = index;
+
+            slides[currentSlide].classList.remove('opacity-0', 'z-0');
+            slides[currentSlide].classList.add('opacity-100', 'z-10');
+            dots[currentSlide].className = 'w-6 h-2.5 rounded-full bg-dorado transition-all';
+        }
+
+        function startCarouselAuto() {
+            if (carouselInterval) clearInterval(carouselInterval);
+            carouselInterval = setInterval(() => {
+                if (isCarouselPlaying) {
+                    goToSlide((currentSlide + 1) % CAROUSEL_SLIDES.length);
+                }
+            }, 4000);
+        }
+
+        function toggleCarouselPlay() {
+            isCarouselPlaying = !isCarouselPlaying;
+            const icon = document.getElementById('play-pause-icon');
+            const text = document.getElementById('play-pause-text');
+
+            if (isCarouselPlaying) {
+                icon.className = 'fa-solid fa-pause';
+                text.innerText = 'Pausar';
+            } else {
+                icon.className = 'fa-solid fa-play';
+                text.innerText = 'Reanudar';
+            }
+        }
+
+
+        // --- FORM & REAL-TIME VALIDATION ---
+        function initFormValidation() {
+            const plantedInput = document.getElementById('seeds-planted');
+            const germinatedInput = document.getElementById('seeds-germinated');
+            const btnSubmit = document.getElementById('btn-submit-sample');
+
+            const updatePreview = () => {
+                const planted = parseInt(plantedInput.value) || 0;
+                const germinated = parseInt(germinatedInput.value) || 0;
+                const alertBox = document.getElementById('validation-alert');
+
+                document.getElementById('preview-planted').innerText = planted;
+                document.getElementById('preview-germinated').innerText = germinated;
+
+                let isValid = true;
+                let errorMsg = '';
+
+                if (planted < 0 || germinated < 0) {
+                    isValid = false;
+                    errorMsg = 'No se permiten cantidades de semillas negativas.';
+                } else if (germinated > planted && planted > 0) {
+                    isValid = false;
+                    errorMsg = 'Las semillas germinadas no pueden superar a las sembradas.';
+                }
+
+                if (!isValid) {
+                    alertBox.className = 'p-4 rounded-xl text-xs sm:text-sm font-semibold bg-red-100 text-red-800 border border-red-300 block';
+                    alertBox.innerHTML = `<i class="fa-solid fa-triangle-exclamation"></i> ${errorMsg}`;
+                    document.getElementById('preview-rate').innerText = 'ERROR';
+                    document.getElementById('preview-badge').className = 'inline-block mt-2 px-3 py-1 rounded-full text-xs font-bold bg-red-200 text-red-800';
+                    document.getElementById('preview-badge').innerText = 'Invalido';
+                    btnSubmit.disabled = true;
+                    btnSubmit.classList.add('opacity-50', 'cursor-not-allowed');
+                } else {
+                    alertBox.className = 'hidden';
+                    btnSubmit.disabled = false;
+                    btnSubmit.classList.remove('opacity-50', 'cursor-not-allowed');
+
+                    if (planted > 0) {
+                        const rate = ((germinated / planted) * 100).toFixed(1);
+                        document.getElementById('preview-rate').innerText = `${rate}%`;
+                        
+                        const badge = document.getElementById('preview-badge');
+                        if (rate >= 70) {
+                            badge.className = 'inline-block mt-2 px-3 py-1 rounded-full text-xs font-bold bg-green-500 text-white';
+                            badge.innerText = 'Rendimiento Alto (>70%)';
+                        } else if (rate >= 30) {
+                            badge.className = 'inline-block mt-2 px-3 py-1 rounded-full text-xs font-bold bg-amber-500 text-white';
+                            badge.innerText = 'Rendimiento Medio (30-70%)';
+                        } else {
+                            badge.className = 'inline-block mt-2 px-3 py-1 rounded-full text-xs font-bold bg-red-500 text-white';
+                            badge.innerText = 'Rendimiento Bajo (<30%)';
+                        }
+                    } else {
+                        document.getElementById('preview-rate').innerText = '0.0%';
+                        document.getElementById('preview-badge').className = 'inline-block mt-2 px-3 py-1 rounded-full text-xs font-bold bg-gray-600 text-white';
+                        document.getElementById('preview-badge').innerText = 'Esperando Datos...';
+                    }
+                }
+            };
+
+            plantedInput.addEventListener('input', updatePreview);
+            germinatedInput.addEventListener('input', updatePreview);
+
+            btnSubmit.addEventListener('click', () => {
+                const name = document.getElementById('sample-name').value.trim();
+                const location = document.getElementById('sample-location').value;
+                const species = document.getElementById('sample-species').value;
+                const date = document.getElementById('sample-date').value;
+                const planted = parseInt(plantedInput.value);
+                const germinated = parseInt(germinatedInput.value);
+                const temp = parseFloat(document.getElementById('sample-temp').value) || 12;
+                const humidity = parseInt(document.getElementById('sample-humidity').value) || 80;
+
+                if (!name || isNaN(planted) || isNaN(germinated) || planted <= 0 || germinated < 0 || germinated > planted) {
+                    alert('Por favor completa todos los campos requeridos con valores válidos.');
+                    return;
+                }
+
+                const newSample = {
+                    id: Date.now().toString(),
+                    name,
+                    location,
+                    species,
+                    date,
+                    planted,
+                    germinated,
+                    temp,
+                    humidity
+                };
+
+                samples.unshift(newSample);
+                saveSamples();
+                renderAll();
+
+                // Reset Form
+                document.getElementById('sample-name').value = '';
+                plantedInput.value = '';
+                germinatedInput.value = '';
+                updatePreview();
+
+                // Scroll to Database Section
+                document.getElementById('registros').scrollIntoView({ behavior: 'smooth' });
+            });
+        }
+
+
+        // --- TABLE & SEARCH/FILTER MODULE ---
+        function initTableEvents() {
+            // Search Input
+            document.getElementById('search-input').addEventListener('input', (e) => {
+                searchQuery = e.target.value.toLowerCase();
+                renderTable();
+            });
+
+            // Filter Buttons
+            const filterBtns = document.querySelectorAll('.filter-btn');
+            filterBtns.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    filterBtns.forEach(b => {
+                        b.classList.remove('bg-paramo-800', 'text-white');
+                        b.classList.add('bg-gray-100', 'text-gray-700');
+                    });
+                    btn.classList.remove('bg-gray-100', 'text-gray-700');
+                    btn.classList.add('bg-paramo-800', 'text-white');
+
+                    activeFilter = btn.getAttribute('data-filter');
+                    renderTable();
+                });
+            });
+
+            // Reset Default Samples Button
+            document.getElementById('btn-reset-default').addEventListener('click', () => {
+                if (confirm('¿Deseas restaurar la lista de muestras a sus datos iniciales por defecto?')) {
+                    samples = [...DEFAULT_SAMPLES];
+                    saveSamples();
+                    renderAll();
+                }
+            });
+        }
+
+        function renderTable() {
+            const tbody = document.getElementById('samples-table-body');
+            tbody.innerHTML = '';
+
+            const filtered = samples.filter(sample => {
+                const rate = (sample.germinated / sample.planted) * 100;
+                
+                // Search Match
+                const matchSearch = sample.name.toLowerCase().includes(searchQuery) ||
+                                    sample.location.toLowerCase().includes(searchQuery) ||
+                                    sample.species.toLowerCase().includes(searchQuery);
+
+                // Filter Match
+                let matchFilter = true;
+                if (activeFilter === 'high') matchFilter = rate >= 70;
+                else if (activeFilter === 'medium') matchFilter = rate >= 30 && rate < 70;
+                else if (activeFilter === 'low') matchFilter = rate < 30;
+
+                return matchSearch && matchFilter;
+            });
+
+            if (filtered.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="7" class="py-8 text-center text-gray-400">
+                            <i class="fa-solid fa-folder-open text-3xl mb-2"></i>
+                            <p class="text-xs">No se encontraron registros de muestras.</p>
+                        </td>
+                    </tr>
+                `;
+            } else {
+                filtered.forEach(sample => {
+                    const rate = ((sample.germinated / sample.planted) * 100).toFixed(1);
+                    
+                    let badgeClass = 'bg-red-100 text-red-800 border-red-200';
+                    if (rate >= 70) badgeClass = 'bg-green-100 text-green-800 border-green-200';
+                    else if (rate >= 30) badgeClass = 'bg-amber-100 text-amber-800 border-amber-200';
+
+                    const tr = document.createElement('tr');
+                    tr.className = 'hover:bg-paramo-50/60 transition-colors';
+                    tr.innerHTML = `
+                        <td class="py-3.5 px-4 font-bold text-paramo-900">${sample.name}</td>
+                        <td class="py-3.5 px-4">
+                            <span class="block font-semibold text-gray-800">${sample.location}</span>
+                            <span class="block text-[11px] text-gray-500 italic">${sample.species}</span>
+                        </td>
+                        <td class="py-3.5 px-4 text-xs text-gray-600">${sample.date}</td>
+                        <td class="py-3.5 px-4 text-center font-semibold">${sample.planted}</td>
+                        <td class="py-3.5 px-4 text-center font-semibold text-green-700">${sample.germinated}</td>
+                        <td class="py-3.5 px-4 text-center">
+                            <span class="inline-block px-2.5 py-1 rounded-full text-xs font-bold border ${badgeClass}">
+                                ${rate}%
+                            </span>
+                        </td>
+                        <td class="py-3.5 px-4 text-right">
+                            <button onclick="deleteSample('${sample.id}')" class="text-red-500 hover:text-red-700 p-1.5 rounded hover:bg-red-50 transition-colors" title="Eliminar muestra">
+                                <i class="fa-solid fa-trash-can"></i>
+                            </button>
+                        </td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+            }
+
+            document.getElementById('table-count-label').innerText = `Mostrando ${filtered.length} de ${samples.length} registros`;
+        }
+
+        window.deleteSample = function (id) {
+            if (confirm('¿Estás seguro de que deseas eliminar esta muestra de la base de datos?')) {
+                samples = samples.filter(s => s.id !== id);
+                saveSamples();
+                renderAll();
+            }
+        };
+
+
+        // --- EXCEL IMPORT / EXPORT MODULE (SheetJS) ---
+        function initExcelModule() {
+            // Import Excel/CSV
+            document.getElementById('excel-file-input').addEventListener('change', function (e) {
+                const file = e.target.files[0];
+                if (!file) return;
+
+                const reader = new FileReader();
+                reader.onload = function (evt) {
+                    try {
+                        const data = new Uint8Array(evt.target.result);
+                        const workbook = XLSX.read(data, { type: 'array' });
+                        const firstSheetName = workbook.SheetNames[0];
+                        const worksheet = workbook.Sheets[firstSheetName];
+                        const json = XLSX.utils.sheet_to_json(worksheet);
+
+                        let addedCount = 0;
+                        json.forEach(row => {
+                            // Map columns safely
+                            const name = row['Muestra'] || row['Nombre'] || row['muestra'] || `Muestra Importada ${Date.now()}`;
+                            const location = row['Páramo'] || row['Ubicación'] || 'Páramo Desconocido';
+                            const species = row['Especie'] || 'Espeletia grandiflora';
+                            const date = row['Fecha'] || new Date().toISOString().split('T')[0];
+                            const planted = parseInt(row['Sembradas'] || row['sembradas'] || 0);
+                            const germinated = parseInt(row['Germinadas'] || row['germinadas'] || 0);
+
+                            if (planted > 0 && germinated >= 0 && germinated <= planted) {
+                                samples.unshift({
+                                    id: Date.now() + Math.random().toString(),
+                                    name,
+                                    location,
+                                    species,
+                                    date,
+                                    planted,
+                                    germinated,
+                                    temp: parseFloat(row['Temperatura']) || 12,
+                                    humidity: parseInt(row['Humedad']) || 80
+                                });
+                                addedCount++;
+                            }
+                        });
+
+                        if (addedCount > 0) {
+                            saveSamples();
+                            renderAll();
+                            alert(`¡Éxito! Se importaron ${addedCount} muestras desde el archivo Excel.`);
+                        } else {
+                            alert('No se encontraron filas con el formato requerido en la planilla Excel.');
+                        }
+                    } catch (err) {
+                        alert('Error al procesar la planilla de Excel. Verifica que el archivo no esté dañado.');
+                    }
+                };
+                reader.readAsArrayBuffer(file);
+            });
+
+            // Export to Excel
+            document.getElementById('btn-export-excel').addEventListener('click', () => {
+                if (samples.length === 0) {
+                    alert('No hay datos disponibles para exportar.');
+                    return;
+                }
+
+                const exportData = samples.map(s => ({
+                    'Muestra': s.name,
+                    'Páramo': s.location,
+                    'Especie': s.species,
+                    'Fecha': s.date,
+                    'Semillas Sembradas': s.planted,
+                    'Semillas Germinadas': s.germinated,
+                    'Tasa Germinación (%)': parseFloat(((s.germinated / s.planted) * 100).toFixed(1)),
+                    'Temperatura (°C)': s.temp || 12,
+                    'Humedad (%)': s.humidity || 80
+                }));
+
+                const worksheet = XLSX.utils.json_to_sheet(exportData);
+                const workbook = XLSX.utils.book_new();
+                XLSX.utils.book_append_sheet(workbook, worksheet, 'Germinacion_Frailejones');
+                XLSX.writeFile(workbook, `SemillaLab_Frailejones_${new Date().toISOString().split('T')[0]}.xlsx`);
+            });
+        }
+
+
+        // --- CHART ANALYTICS (Chart.js) ---
+        function updateChart() {
+            const ctx = document.getElementById('germination-chart').getContext('2d');
+            
+            // Limit to top 8 samples for clarity
+            const displaySamples = samples.slice(0, 8);
+            const labels = displaySamples.map(s => s.name);
+            const plantedData = displaySamples.map(s => s.planted);
+            const germinatedData = displaySamples.map(s => s.germinated);
+
+            if (chartInstance) {
+                chartInstance.destroy();
+            }
+
+            chartInstance = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [
+                        {
+                            label: 'Semillas Sembradas',
+                            data: plantedData,
+                            backgroundColor: '#3A6051',
+                            borderRadius: 6
+                        },
+                        {
+                            label: 'Semillas Germinadas',
+                            data: germinatedData,
+                            backgroundColor: '#D4AF37',
+                            borderRadius: 6
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                            labels: { font: { family: 'Inter', size: 12 } }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            grid: { color: 'rgba(0, 0, 0, 0.05)' }
+                        },
+                        x: {
+                            grid: { display: false }
+                        }
+                    }
+                }
+            });
+        }
+
+
+        // --- PREDICTIVE SIMULATOR (Bioclima Sim) ---
+        function initPredictiveSim() {
+            const tempInput = document.getElementById('sim-temp');
+            const humInput = document.getElementById('sim-humidity');
+            const altInput = document.getElementById('sim-alt');
+            const treatmentRadios = document.querySelectorAll('input[name="sim-treatment"]');
+
+            const recalculate = () => {
+                const temp = parseFloat(tempInput.value);
+                const hum = parseInt(humInput.value);
+                const alt = parseInt(altInput.value);
+                let treatment = 'control';
+                treatmentRadios.forEach(r => { if (r.checked) treatment = r.value; });
+
+                // Label updates
+                document.getElementById('sim-temp-val').innerText = `${temp.toFixed(1)} °C`;
+                document.getElementById('sim-humidity-val').innerText = `${hum} %`;
+                document.getElementById('sim-alt-val').innerText = `${alt} m`;
+
+                // Base Simulation Logic (Ecological algorithm for Espeletia spp.)
+                let baseRate = 50;
+
+                // Temp curve (Optimal ~11-13 °C)
+                const tempDiff = Math.abs(temp - 12);
+                baseRate -= tempDiff * 4.5;
+
+                // Humidity curve (Optimal 75-90%)
+                if (hum >= 75 && hum <= 90) baseRate += 15;
+                else if (hum < 60) baseRate -= (60 - hum) * 0.8;
+
+                // Altitude factor
+                if (alt > 3800) baseRate -= 8; // High radiation & cold stress
+
+                // Treatment boost
+                if (treatment === 'cold') baseRate += 18; // Stratification breaks physical dormancy
+                if (treatment === 'scarification') baseRate += 12;
+
+                // Clamping
+                let finalRate = Math.min(Math.max(Math.round(baseRate), 8), 95);
+
+                // Estimated Days Calculation
+                let days = Math.round(45 - (temp * 0.8) - (treatment !== 'control' ? 10 : 0));
+                days = Math.max(days, 18);
+
+                // Dynamic UI updates
+                document.getElementById('sim-result-rate').innerText = `${finalRate}%`;
+                document.getElementById('sim-result-days').innerText = `${days} días`;
+
+                const vigorLabel = document.getElementById('sim-result-vigor');
+                const recText = document.getElementById('sim-result-recommendation');
+
+                if (finalRate >= 65) {
+                    vigorLabel.innerText = 'Alto (Óptimo)';
+                    vigorLabel.className = 'text-xl font-bold text-green-400 font-mono';
+                    recText.innerText = `Microclima excelente. El tratamiento elegido (${treatment === 'cold' ? 'Estratificación en Frío' : 'Tratamiento actual'}) acelera la apertura de cotiledones. Mantener el sustrato húmedo con abrigo nocturno.`;
+                } else if (finalRate >= 40) {
+                    vigorLabel.innerText = 'Medio (Regular)';
+                    vigorLabel.className = 'text-xl font-bold text-amber-400 font-mono';
+                    recText.innerText = 'Tasa moderada. Se sugiere aplicar estratificación en frío previa (4°C por 14 días) y ajustar la humedad relativa por encima del 75%.';
+                } else {
+                    vigorLabel.innerText = 'Bajo (Riesgo)';
+                    vigorLabel.className = 'text-xl font-bold text-red-400 font-mono';
+                    recText.innerText = 'Condiciones desfavorables. La temperatura o la resequedad inhiben el embrión. Recomendamos simular en invernadero geotérmico protegido.';
+                }
+            };
+
+            tempInput.addEventListener('input', recalculate);
+            humInput.addEventListener('input', recalculate);
+            altInput.addEventListener('input', recalculate);
+            treatmentRadios.forEach(r => r.addEventListener('change', recalculate));
+
+            recalculate();
+        }
+
+
+        // --- FAQ ACCORDION ---
+        function initFAQ() {
+            const btns = document.querySelectorAll('.faq-btn');
+            btns.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const content = btn.nextElementSibling;
+                    const icon = btn.querySelector('i');
+
+                    const isOpen = !content.classList.contains('hidden');
+
+                    // Close all
+                    document.querySelectorAll('.faq-content').forEach(c => c.classList.add('hidden'));
+                    document.querySelectorAll('.faq-btn i').forEach(i => i.classList.remove('rotate-180'));
+
+                    if (!isOpen) {
+                        content.classList.remove('hidden');
+                        icon.classList.add('rotate-180');
+                    }
+                });
+            });
+        }
+
+
+        // --- MOBILE NAV ---
+        function initMobileNav() {
+            const menuBtn = document.getElementById('mobile-menu-btn');
+            const menu = document.getElementById('mobile-menu');
+            const links = document.querySelectorAll('.mobile-link');
+
+            menuBtn.addEventListener('click', () => {
+                menu.classList.toggle('hidden');
+            });
+
+            links.forEach(l => {
+                l.addEventListener('click', () => {
+                    menu.classList.add('hidden');
+                });
+            });
+        }
+
+
+        // --- RENDER ALL METRICS & DASHBOARD ---
+        function renderAll() {
+            renderTable();
+            updateChart();
+
+            // Quick Stats Hero
+            const totalSamples = samples.length;
+            const totalPlanted = samples.reduce((acc, s) => acc + s.planted, 0);
+            const totalGerminated = samples.reduce((acc, s) => acc + s.germinated, 0);
+            const avgRate = totalPlanted > 0 ? ((totalGerminated / totalPlanted) * 100).toFixed(1) : '0.0';
+
+            document.getElementById('quick-samples').innerText = totalSamples;
+            document.getElementById('quick-germinated').innerText = totalGerminated;
+            document.getElementById('quick-rate').innerText = `${avgRate}%`;
+
+            // KPI Dashboard Cards
+            document.getElementById('kpi-total-samples').innerText = totalSamples;
+            document.getElementById('kpi-total-planted').innerText = totalPlanted;
+            document.getElementById('kpi-total-germinated').innerText = totalGerminated;
+            document.getElementById('kpi-avg-rate').innerText = `${avgRate}%`;
+        }
+    </script>
+</body>
+</html>
